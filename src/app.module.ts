@@ -2,13 +2,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserSchema } from './user.model';
+import { BookModule } from './books/books.modules';
 
 @Module({
-  imports: [
-    MongooseModule.forRoot('mongodb+srv://tayyaba:tayyaba@cluster0.kql16.mongodb.net/NestJsSimpleCRUD'),
-    MongooseModule.forFeature([{name:'user',schema:UserSchema}])
-  ],
+  imports: [MongooseModule.forRoot('mongodb://localhost/nest'), BookModule],
   controllers: [AppController],
   providers: [AppService],
 })

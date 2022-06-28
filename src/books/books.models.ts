@@ -6,9 +6,9 @@ export type BookDocument = BooksClass & Document;
 @Schema()
 export class BooksClass {
   @Prop()
+  require: true;
+  unique: true;
   Title: string;
-  require:true
-  unique:true
 
   @Prop()
   Description: string;
@@ -17,7 +17,7 @@ export class BooksClass {
   Price: string;
 
   @Prop()
-  Aurthor:string;
+  Author: string;
 }
 
 export const BooksSchema = SchemaFactory.createForClass(BooksClass);

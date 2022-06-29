@@ -16,16 +16,16 @@ import {
     getHello(): any {
       throw new Error('Method not implemented.');
     }
-    constructor(private readonly appService: BookService) {}
+    constructor(private readonly  BookService: BookService) {}
   
     @Post()
     async createUser(@Body() BookDto: BooksClass) {
-      return this.appService.createBook(BookDto);
+      return this.BookService.createBook(BookDto);
     }
   
     @Get()
     readUser() {
-      return this.appService.readBook();
+      return this.BookService.readBook();
     }
   
     @Put(':id')
@@ -33,12 +33,12 @@ import {
       @Param('id') id: string,
       @Body() updateData: BookUpdateDto,
     ): Promise<BooksClass> {
-      return this.appService.updateBook(id, updateData);
+      return this.BookService.updateBook(id, updateData);
     }
   
     @Delete(':id')
     async deleteUser(@Param('id') id: string) {
-      return this.appService.deleteBook(id);
+      return this.BookService.deleteBook(id);
     }
   }
   

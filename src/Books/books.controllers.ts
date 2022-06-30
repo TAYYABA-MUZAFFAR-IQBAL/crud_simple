@@ -21,6 +21,7 @@ export class BookController {
   }
   constructor(private readonly BookService: BookService) {}
 
+
   @Post()
   @ApiOperation({ summary: 'Add a new book from this API' })
   @ApiBody({
@@ -53,6 +54,8 @@ export class BookController {
   @ApiResponse({
     status: 201,
     description: 'Success',
+    type: BooksClass,
+   
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
@@ -66,6 +69,7 @@ export class BookController {
   @ApiResponse({
     status: 200,
     description: 'success',
+    type: BooksClass,
   })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   readUser() {
@@ -79,7 +83,7 @@ export class BookController {
     description: 'enter unique id',
     required: true,
     name: 'id',
-  })
+      })
   @ApiBody({
     schema: {
       type: 'object',
@@ -107,7 +111,7 @@ export class BookController {
       },
     },
   })
-  @ApiResponse({ status: 200, description: 'success' })
+  @ApiResponse({ status: 200, description: 'success' , type: BooksClass})
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async updateUser(
     @Param('id') id: string,
@@ -119,7 +123,7 @@ export class BookController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Api to Delete book from DB' })
-  @ApiResponse({ status: 200, description: 'success' })
+  @ApiResponse({ status: 200, description: 'success' ,type: BooksClass})
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async deleteUser(@Param('id') id: string) {
     console.log('Deleted.....');

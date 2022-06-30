@@ -6,7 +6,7 @@ export type BookDocument = BooksClass & Document;
 @Schema()
 export class BooksClass {
   @ApiProperty({
-    description: 'The title is the name of book which musb be unique.',
+    description: 'The title is the name of book which must be unique.',
   })
   @Prop({ required: true, unique: true })
   Title: string;

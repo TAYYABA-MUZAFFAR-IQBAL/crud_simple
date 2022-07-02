@@ -3,7 +3,7 @@ import { UserDetails } from '../User/userInterface.details';
 import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { NewUserDTO } from '../User/dto/newUser.dto';
-import { UserService } from './../user/user.service';
+import { UserService } from '../User/user.service';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()

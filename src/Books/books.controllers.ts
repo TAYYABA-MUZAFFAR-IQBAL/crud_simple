@@ -77,6 +77,15 @@ export class BookController {
     return this.BookService.readBook();
   }
 
+  //get book by id
+  @Get(':id')
+  @ApiOperation({ summary: 'Api to get Book by id' })
+  @ApiResponse({ status: 200, description: 'success' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+   getUser(@Param('id') id: string): Promise<BooksClass | null> {
+    return this.BookService.findById(id);
+  }
+
   @Put(':id')
   @ApiOperation({ summary: 'Update the book in DB' })
   @ApiParam({

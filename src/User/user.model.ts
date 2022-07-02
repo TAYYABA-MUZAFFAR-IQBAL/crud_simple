@@ -24,15 +24,18 @@ export class UserSchema {
     description: 'password.',
   })
   @Prop({ required: true })
+  
   password: string;
 
   @ApiProperty({
     description: 'role of user',
-    enum:[UserRole.Admin,UserRole.Librarian,UserRole.User],
-    isArray: true,
+    enum:UserRole,
+    type:"enum",
+    
+    
   })
   @Prop({ required: true })
-  role:[UserRole.Admin,UserRole.Librarian,UserRole.User] ;
+  role:UserRole ;
 }
 
 export const UserModel = SchemaFactory.createForClass(UserSchema);

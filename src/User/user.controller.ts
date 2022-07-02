@@ -4,7 +4,9 @@ import {
   Delete,
   Get,
   Param,
+  UseGuards,
   Post,
+  Request,
   Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -13,56 +15,15 @@ import { UserUpdateDto } from './UserUpdate.dto';
 import { UserRole } from './Role.enum';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ApiResponse } from '@nestjs/swagger';
+import * as bcrypt from 'bcrypt';
+import { UserDetails } from './userInterface.details';
 
 @ApiTags('User CRUD')
 @Controller('user')
 export class UserController {
-  getHello(): any {
-    throw new Error('Method not implemented.');
-  }
+ 
   constructor(private readonly UserService: UserService) {}
 
-  //add user
-  @Post()
-  @ApiOperation({ summary: 'Api to add new user' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        User_name: {
-          type: 'string',
-          example: 'test',
-          description: 'this is the name of user',
-        },
-        email: {
-          type: 'string',
-          example: 'test',
-          description: 'this is the email of user must be unique',
-        },
-        password: {
-          type: 'string',
-          example: '******',
-          description: 'pasword of user',
-        },
-        role: {
-          type: 'string',
-          enum: [UserRole.Admin, UserRole.Librarian, UserRole.User],
-          description: 'role of user must be the given role to select',
-        },
-      },
-    },
-  })
-  @ApiResponse({
-    status: 201,
-    description: 'Success',
-    type: UserSchema,
-  })
-  @ApiResponse({ status: 403, description: 'Forbidden.' })
-  @ApiResponse({ status: 500, description: 'Internal Server Error' })
-  async createUser(@Body() User: UserSchema) {
-    console.log('Added Sucessfully.....');
-    return this.UserService.addUser(User);
-  }
   //get all user
   @Get()
   @ApiOperation({ summary: 'This API Get All Users From DB' })
@@ -82,10 +43,10 @@ export class UserController {
   @ApiOperation({ summary: 'Api to get user by id' })
   @ApiResponse({ status: 200, description: 'success' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-  async findOne(@Param('id') id: string) {
-    console.log('User extracted.....');
-    return this.UserService.findOneUser(id);
+   getUser(@Param('id') id: string): Promise<UserDetails | null> {
+    return this.UserService.findById(id);
   }
+
 
   @Put(':id')
   @ApiOperation({ summary: 'Update the user in DB' })
@@ -121,6 +82,8 @@ export class UserController {
       },
     },
   })
+
+
   @ApiResponse({ status: 200, description: 'success', type: UserUpdateDto })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async updateUserId(
@@ -139,4 +102,5 @@ export class UserController {
     console.log('Deleted.....');
     return this.UserService.delUser(id);
   }
+  
 }

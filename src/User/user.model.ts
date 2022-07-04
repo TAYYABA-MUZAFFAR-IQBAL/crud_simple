@@ -31,11 +31,11 @@ export class UserSchema {
     description: 'role of user',
     enum:UserRole,
     type:"enum",
-    
+    default:UserRole.User,
     
   })
   @Prop({ required: true })
-  role:UserRole ;
+  role:UserRole[] ;
 }
 
 export const UserModel = SchemaFactory.createForClass(UserSchema);

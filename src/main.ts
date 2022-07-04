@@ -10,11 +10,22 @@ async function bootstrap() {
     .setTitle('Swagger Test In NestJS')
     .setDescription('Practice API Application')
     .setVersion('v1')
-     .build();
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'JWT',
+      description: 'Enter JWT token',
+      in: 'header',
+    },
+    'JWT-auth',
+    )
+    
+    .build();
   //swagger document creation for this demo
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT ||3000);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

@@ -37,9 +37,10 @@ export class AuthController {
           description: 'pasword of user',
         },
         role: {
-          type: 'string',
+          type: 'enum',
           enum: [UserRole.Admin, UserRole.Librarian, UserRole.User],
           description: 'role of user must be the given role to select',
+          default:UserRole.User,
         },
       },
     },

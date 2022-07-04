@@ -19,7 +19,8 @@ export class UserService {
     return {
       id: user._id,
       User_name: user.User_name,
-      email: user.email
+      email: user.email,
+      role: user.role,
       
     };
   }
@@ -38,7 +39,7 @@ export class UserService {
     User_name: string,
     email: string,
     hashedPassword: string,
-    role:[UserRole.Admin, UserRole.Librarian, UserRole.User]
+    role:UserRole
   ): Promise<UserDocument> {
     const newUser = new this.UserMod({
       User_name,

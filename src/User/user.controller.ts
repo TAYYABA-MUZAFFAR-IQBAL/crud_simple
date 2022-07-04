@@ -13,19 +13,24 @@ import { UserService } from './user.service';
 import { UserSchema } from './user.model';
 import { UserUpdateDto } from './UserUpdate.dto';
 import { UserRole } from './Role.enum';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { ApiResponse } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { UserDetails } from './userInterface.details';
-
+import { hasRoles } from '../Auth/Decorators/UserHasRoles';
+import { RolesGuard } from '../Auth/Guard/roleGuard';
+import { JwtGuard } from '../Auth/Guard/jwt.guard';
 @ApiTags('User CRUD')
 @Controller('user')
 export class UserController {
- 
   constructor(private readonly UserService: UserService) {}
 
   //get all user
+
+  @UseGuards(JwtGuard, RolesGuard)
   @Get()
+  @hasRoles(UserRole.Admin)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'This API Get All Users From DB' })
   @ApiResponse({
     status: 200,
@@ -39,16 +44,23 @@ export class UserController {
   }
 
   //get user by id
+
+  @UseGuards(JwtGuard, RolesGuard)
   @Get(':id')
+  @hasRoles(UserRole.Admin, UserRole.Librarian)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Api to get user by id' })
   @ApiResponse({ status: 200, description: 'success' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-   getUser(@Param('id') id: string): Promise<UserDetails | null> {
+  getUser(@Param('id') id: string): Promise<UserDetails | null> {
     return this.UserService.findById(id);
   }
 
-
+  
+  @UseGuards(JwtGuard, RolesGuard)
   @Put(':id')
+  @hasRoles(UserRole.Admin)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update the user in DB' })
   @ApiParam({
     description: 'enter unique id',
@@ -82,8 +94,6 @@ export class UserController {
       },
     },
   })
-
-
   @ApiResponse({ status: 200, description: 'success', type: UserUpdateDto })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async updateUserId(
@@ -94,7 +104,11 @@ export class UserController {
     return this.UserService.userUpdate(id, UserUpdate);
   }
 
+
+  @UseGuards(JwtGuard, RolesGuard)
   @Delete(':id')
+  @hasRoles(UserRole.Admin)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Api to Delete user from DB' })
   @ApiResponse({ status: 200, description: 'success', type: UserSchema })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -102,5 +116,4 @@ export class UserController {
     console.log('Deleted.....');
     return this.UserService.delUser(id);
   }
-  
 }

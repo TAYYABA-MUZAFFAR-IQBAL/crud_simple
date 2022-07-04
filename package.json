@@ -23,6 +23,7 @@
     "heroku-prebuild": "npm install --only=dev"
   },
   "dependencies": {
+    "@casl/ability": "^5.4.4",
     "@nestjs/common": "^8.4.7",
     "@nestjs/config": "^2.1.0",
     "@nestjs/core": "^8.0.0",

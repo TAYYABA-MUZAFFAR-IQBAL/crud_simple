@@ -5,10 +5,9 @@ import {
   Get,
   Param,
   UseGuards,
-  Post,
-  Request,
-  Put,
+   Put,
 } from '@nestjs/common';
+
 import { UserService } from './user.service';
 import { UserSchema } from './user.model';
 import { UserUpdateDto } from './UserUpdate.dto';
@@ -20,6 +19,9 @@ import { UserDetails } from './userInterface.details';
 import { hasRoles } from '../Auth/Decorators/UserHasRoles';
 import { RolesGuard } from '../Auth/Guard/roleGuard';
 import { JwtGuard } from '../Auth/Guard/jwt.guard';
+import { SecureRoute } from '../Auth/Guard/SecureRoute.guard';
+
+
 @ApiTags('User CRUD')
 @Controller('user')
 export class UserController {
@@ -45,10 +47,11 @@ export class UserController {
 
   //get user by id
 
-  @UseGuards(JwtGuard, RolesGuard)
+  @UseGuards(JwtGuard, SecureRoute,RolesGuard)
+   
   @Get(':id')
   @hasRoles(UserRole.Admin, UserRole.Librarian)
-  @ApiBearerAuth('JWT-auth')
+   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Api to get user by id' })
   @ApiResponse({ status: 200, description: 'success' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -57,10 +60,10 @@ export class UserController {
   }
 
   
-  @UseGuards(JwtGuard, RolesGuard)
-  @Put(':id')
+  @UseGuards(JwtGuard,SecureRoute, RolesGuard)
   @hasRoles(UserRole.Admin)
-  @ApiBearerAuth('JWT-auth')
+  @Put(':id')
+   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update the user in DB' })
   @ApiParam({
     description: 'enter unique id',
@@ -100,14 +103,15 @@ export class UserController {
     @Param('id') id: string,
     @Body() UserUpdate: UserUpdateDto,
   ): Promise<UserSchema> {
+    
     console.log('updated.....');
     return this.UserService.userUpdate(id, UserUpdate);
   }
 
 
   @UseGuards(JwtGuard, RolesGuard)
-  @Delete(':id')
   @hasRoles(UserRole.Admin)
+  @Delete(':id')
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Api to Delete user from DB' })
   @ApiResponse({ status: 200, description: 'success', type: UserSchema })

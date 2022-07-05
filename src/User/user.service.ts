@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ExecutionContext, Injectable } from '@nestjs/common';
 import { UserSchema, UserDocument } from './user.model';
 import { FilterQuery, Model, UpdateQuery } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,6 +8,9 @@ import { UserRole } from './Role.enum';
 
 @Injectable()
 export class UserService {
+  static create(context: ExecutionContext) {
+    throw new Error('Method not implemented.');
+  }
   [x: string]: any;
   constructor(
     @InjectModel( UserSchema.name) private UserMod: Model<UserDocument>,

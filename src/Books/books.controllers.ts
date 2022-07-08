@@ -53,6 +53,7 @@ export class BookController {
   @ApiResponse({
     status: 201,
     description: 'Success',
+    type: BooksClass,
   })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error' })
@@ -66,11 +67,21 @@ export class BookController {
   @ApiResponse({
     status: 200,
     description: 'success',
+    type: BooksClass,
   })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   readUser() {
     console.log('All data Extracted....');
     return this.BookService.readBook();
+  }
+
+  //get book by id
+  @Get(':id')
+  @ApiOperation({ summary: 'Api to get Book by id' })
+  @ApiResponse({ status: 200, description: 'success' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  getUser(@Param('id') id: string): Promise<BooksClass | null> {
+    return this.BookService.findById(id);
   }
 
   @Put(':id')
@@ -107,7 +118,7 @@ export class BookController {
       },
     },
   })
-  @ApiResponse({ status: 200, description: 'success' })
+  @ApiResponse({ status: 200, description: 'success', type: BooksClass })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async updateUser(
     @Param('id') id: string,
@@ -119,7 +130,7 @@ export class BookController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Api to Delete book from DB' })
-  @ApiResponse({ status: 200, description: 'success' })
+  @ApiResponse({ status: 200, description: 'success', type: BooksClass })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async deleteUser(@Param('id') id: string) {
     console.log('Deleted.....');

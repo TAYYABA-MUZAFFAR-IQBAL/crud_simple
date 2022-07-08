@@ -23,6 +23,18 @@ export class BookService {
       })
       .catch((err) => console.log(err));
   }
+  //get book by id
+  async findById(id: string): Promise<BooksClass | null> {
+    const user = await this.BookModel.findById(id).exec();
+    if (user) {
+      console.log('Book for the requested id is extracted...');
+
+      return user;
+    } else {
+      console.log('Book for the requested id is not available...');
+      return null;
+    }
+  }
 
   // upadting the data
   async updateBook(id, data): Promise<BooksClass> {

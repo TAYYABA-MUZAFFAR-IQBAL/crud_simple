@@ -182,7 +182,9 @@ export class AuthController {
   @Get('refresh')
  async refresh(@Req() request: UserSchema) {
     const RegenratedToken = this.authService.RegenrateTokens(request.User_name);
- 
+   const decodedRefreshToken =this.authService.verifyJwt(request.User_name
+    )
+    ;(await decodedRefreshToken).exp
     request.res.setHeader('Refresh-token', RegenratedToken );
     return request.User_name;
   }

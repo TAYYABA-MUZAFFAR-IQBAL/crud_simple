@@ -13,7 +13,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { ExistingUserDTO } from '../User/dto/exisistingUser.dto';
 import { NewUserDTO } from '../User/dto/newUser.dto';
 import { UserRole } from '../User/Role.enum';
@@ -21,8 +27,7 @@ import { UserSchema } from '../User/user.model';
 import { UserDetails } from '../User/userInterface.details';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './Guard/jwt.guard';
-
-import { TokensService } from './RegenerateToken.service';
+import { refreshTokenGuard } from './Guard/refreshToken.guard';
 
 export interface AuthenticationPayload {
   user: UserSchema;
@@ -35,11 +40,7 @@ export interface AuthenticationPayload {
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  private readonly tokens: TokensService;
-
-  constructor(private authService: AuthService, tokens: TokensService) {
-    this.tokens = tokens;
-  }
+  constructor(private authService: AuthService) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Api to add new user' })
@@ -142,18 +143,14 @@ export class AuthController {
     return this.authService.verifyJwt(payload.jwt);
   }
 
-  //refresh request end point 
-  @Get('refresh')
-   async refresh(
-    payload: UserDetails  ,@Res({ passthrough: true }) res: Response,@Req() req
-  ) {
-  const token= this.authService.createJWTToken(payload);
-  console.log(payload);
-  
-  // const { user } = await this.authService.resolveRefreshToken(req,payload);//decode refresh token
-   return{'refreshed tokens':  token,  httpOnly: true };
-  
-}
+  //refresh request end point
+  @UseGuards(JwtGuard, refreshTokenGuard)
+  @ApiBearerAuth('JWT-auth')
+  @Get('refresh-token')
+  async refresh(@Req() req): Promise<{ token: string }> {
+    const token = await this.authService.createJWTToken(req.user.user);
+    return { token };
+  }
 
   //logout route to secure malicioud activity
   @Get('log-out')
@@ -161,7 +158,7 @@ export class AuthController {
   @UseGuards(JwtGuard)
   @HttpCode(200)
   async logOut(@Request() req: any, user: UserDetails) {
-    await this.tokens.removeRefreshToken(user.email);
-    req.res.setHeader('Authorization', null);
+    // await this.tokens.removeRefreshToken(user.email);
+    // req.res.setHeader('Authorization', null);
   }
 }

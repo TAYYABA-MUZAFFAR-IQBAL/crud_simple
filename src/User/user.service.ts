@@ -13,10 +13,6 @@ import { UserRole } from './Role.enum';
 
 @Injectable()
 export class UserService {
-  static create(context: ExecutionContext) {
-    throw new Error('Method not implemented.');
-  }
-  [x: string]: any;
   constructor(
     @InjectModel(UserSchema.name) private UserMod: Model<UserDocument>,
   ) {}
@@ -24,7 +20,7 @@ export class UserService {
   _getUserDetails(user: UserDocument): UserDetails {
     return {
       id: user._id,
-      User_name: user.User_name,
+      user_name: user.user_name,
       email: user.email,
       role: user.role,
     };
@@ -40,18 +36,8 @@ export class UserService {
     return this._getUserDetails(user);
   }
 
-  async create(
-    User_name: string,
-    email: string,
-    hashedPassword: string,
-    role: UserRole,
-  ): Promise<UserDocument> {
-    const newUser = new this.UserMod({
-      User_name,
-      email,
-      password: hashedPassword,
-      role,
-    });
+  async create(user): Promise<UserDocument> {
+    const newUser = new this.UserMod(user);
     return newUser.save();
   }
 
@@ -94,47 +80,26 @@ export class UserService {
       },
     });
   }
-  //get user by email
-  async getByEmail(email: string) {
-    const user = await this.findOneemail(email);
-    if (user) {
-      return user;
-    }
-    throw new HttpException(
-      'User with this email does not exist',
-      HttpStatus.NOT_FOUND,
+
+  /**
+   * saveRefreshToken
+   */
+  public saveRefreshToken(id: string, refreshToken: string) {
+    return this.UserMod.findByIdAndUpdate(
+      id,
+      { refresh_token: refreshToken },
+      { new: true },
     );
   }
-  async findOneemail(email: string): Promise<UserDocument | undefined> {
-    return this.UserMod.findOne({ email });
-  }
 
-  //update remove refresh token
-
-  async updateandsave(
-    email: string,
-    updateUserDto: UserUpdateDto,
-  ): Promise<UserDocument> {
-    return this.userModel
-      .findByIdAndUpdate(email, updateUserDto, { new: true })
-      .exec();
-  }
-
-  public async validRefreshToken(
-    email: string,
-    refreshToken: string,
-  ): Promise<UserDetails> {
-    let user = await this.user.findOne({
-      where: {
-        email: email,
-        refreshToken: refreshToken,
-      },
-    });
-
-    if (!user) {
-      return null;
+  /**
+   * compareRefreshToken
+   */
+  public async compareRefreshToken(id, refreshToken) {
+    const userData = await this.UserMod.findById(id).exec();
+    if (userData.refresh_token === refreshToken) {
+      return true;
     }
-
-    return;
+    return false;
   }
 }

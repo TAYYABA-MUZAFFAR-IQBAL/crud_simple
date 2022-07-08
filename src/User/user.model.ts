@@ -1,8 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
+import { Document } from 'mongoose';
 import { UserRole } from './Role.enum';
-import { Exclude } from 'class-transformer';
 export type UserDocument = UserSchema & Document;
 
 @Schema()
@@ -13,7 +12,7 @@ export class UserSchema {
     nullable: true,
   })
   @Prop()
-  User_name: string;
+  user_name: string;
 
   @ApiProperty({
     description: 'email of user must be unique',
@@ -34,17 +33,10 @@ export class UserSchema {
     default: UserRole.User,
   })
   @Prop({ required: true })
-  role: UserRole[];
+  role: UserRole;
 
   @Prop({ nullable: true })
-  refreshtoken: string;
-
-  @Prop()
-  refreshtokenexpires: string;
-
-  @Prop()
-  is_revoked: Boolean;
-  
+  refresh_token: string;
 }
 
 export const UserModel = SchemaFactory.createForClass(UserSchema);

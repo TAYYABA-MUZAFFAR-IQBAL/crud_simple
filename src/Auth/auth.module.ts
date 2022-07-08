@@ -2,14 +2,12 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../User/user.module';
-import { TokensService } from './RegenerateToken.service';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
 import { JwtGuard } from './Guard/jwt.guard';
 import { JwtStrategy } from './Guard/jwt.strategy';
-import { RefreshStrategy } from './Guard/refreshtoken.strategy';
 import { RolesGuard } from './Guard/roleGuard';
 
 @Module({
@@ -28,14 +26,7 @@ import { RolesGuard } from './Guard/roleGuard';
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    RolesGuard,
-    JwtGuard,
-    JwtStrategy,
-    RefreshStrategy,
-    TokensService,
-  ],
+  providers: [AuthService, RolesGuard, JwtGuard, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

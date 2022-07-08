@@ -103,6 +103,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.OK)
+  // TODO: Fix it later null Issue
   login(@Body() user: ExistingUserDTO): Promise<{ token: string } | null> {
     return this.authService.login(user);
   }

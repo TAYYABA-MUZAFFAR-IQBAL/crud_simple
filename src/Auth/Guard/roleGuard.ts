@@ -40,5 +40,7 @@ export class RolesGuard implements CanActivate {
     if (user && hasRole(user.role)) {
           return true;
     }
+      return;
   }
+
 }

@@ -2,10 +2,8 @@ import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { UserService } from 'src/User/user.service';
-import { HttpException } from '@nestjs/common/exceptions/http.exception';
-import { HttpStatus } from '@nestjs/common';
 import { Request } from 'express';
-import { UserSchema } from '../../User/user.model';
+
 
 @Injectable()
 export class SecureRoute implements CanActivate {

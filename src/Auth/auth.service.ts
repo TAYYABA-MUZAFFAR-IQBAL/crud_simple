@@ -5,7 +5,8 @@ import * as bcrypt from 'bcrypt';
 import { NewUserDTO } from '../User/dto/newUser.dto';
 import { UserService } from '../User/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { UserRole } from '../User/Role.enum';
+import { UserSchema } from 'src/User/user.model';
+var randtoken = require('rand-token');
 
 @Injectable()
 export class AuthService {
@@ -54,32 +55,59 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
     const doesUserExist = !!user;
 
-    if (!doesUserExist) return null;
+    if (!doesUserExist) {
+      throw new HttpException('User not exist..!', HttpStatus.BAD_REQUEST);
+    }
 
     const doesPasswordMatch = await this.doesPasswordMatch(
       password,
       user.password,
     );
 
-    if (!doesPasswordMatch) return null;
+    if (!doesPasswordMatch) {
+      throw new HttpException(
+        'Password not matched..!',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
 
     return this.userService._getUserDetails(user);
   }
 
   async login(
     existingUser: ExistingUserDTO,
-  ): Promise<{ token: string } | null> {
+  ): Promise<{ token: string; refreshtoken: string } | null> {
     const { email, password } = existingUser;
     const user = await this.validateUser(email, password);
 
     if (!user)
       throw new HttpException('Credentials invalid!', HttpStatus.UNAUTHORIZED);
 
-    const jwt = await this.jwtService.signAsync({ user });
-    console.log("user LoggedIn sucessfully",user);
-      return { token: jwt };
+    const jwt = await this.jwtService.signAsync(user);
+    const refresh = await this.jwtService.signAsync(user);
+    console.log('user LoggedIn sucessfully', user);
+    return { token: jwt, refreshtoken: refresh };
   }
+  //resresh token generation
+//  async generateRefreshToken(userId): Promise<string> {
+//     var refreshToken = randtoken.generate(200); //generating refresh token containing 200 digits
+//     var expirydate = new Date();
+//     expirydate.setDate(expirydate.getDate() + 6); //expires in 6 days
+//     await this.userService.saveorupdateRefreshToke(
+//       refreshToken,
+//       userId,
+//       expirydate,
+//     );
+//     return refreshToken;
+//   }
+async RegenrateTokens( payload: string ): Promise<{ token: string; refreshtoken: string } | null>{
+  const jwt = await this.jwtService.signAsync(payload);
+  const refresh = await this.jwtService.signAsync(payload);
+   return { token: jwt, refreshtoken: refresh };
+}
+  
 
+  //jwt expiry generator
   async verifyJwt(jwt: string): Promise<{ exp: number }> {
     try {
       const { exp } = await this.jwtService.verifyAsync(jwt);
@@ -88,4 +116,6 @@ export class AuthService {
       throw new HttpException('Invalid JWT', HttpStatus.UNAUTHORIZED);
     }
   }
+
+ 
 }

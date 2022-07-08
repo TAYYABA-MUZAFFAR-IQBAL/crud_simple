@@ -9,7 +9,7 @@ import { AuthService } from './auth.service';
 
 import { JwtGuard } from './Guard/jwt.guard';
 import { JwtStrategy } from './Guard/jwt.strategy';
-import { JwtRefreshTokenStrategy } from './Guard/refreshtoken.strategy';
+import { RefreshStrategy } from './Guard/refreshtoken.strategy';
 import { RolesGuard } from './Guard/roleGuard';
 
 @Module({
@@ -33,7 +33,7 @@ import { RolesGuard } from './Guard/roleGuard';
     RolesGuard,
     JwtGuard,
     JwtStrategy,
-    JwtRefreshTokenStrategy,
+    RefreshStrategy,
     TokensService,
   ],
   exports: [AuthService],

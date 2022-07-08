@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../User/user.service';
 import { AuthService } from './auth.service';
-var randtoken = require('rand-token');
+
 
 @Injectable()
 export class TokensService {

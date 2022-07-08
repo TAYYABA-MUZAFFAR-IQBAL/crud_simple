@@ -5,9 +5,14 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Request,
+  Res,
+  Response,
+  UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
+
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ExistingUserDTO } from '../User/dto/exisistingUser.dto';
 import { NewUserDTO } from '../User/dto/newUser.dto';
@@ -16,6 +21,7 @@ import { UserSchema } from '../User/user.model';
 import { UserDetails } from '../User/userInterface.details';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './Guard/jwt.guard';
+
 import { TokensService } from './RegenerateToken.service';
 
 export interface AuthenticationPayload {
@@ -104,7 +110,7 @@ export class AuthController {
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @HttpCode(HttpStatus.OK)
   // TODO: Fix it later null Issue
-  login(@Body() user: ExistingUserDTO): Promise<{ token: string } | null> {
+  login(@Body() user: ExistingUserDTO): Promise<{ token: string }> {
     return this.authService.login(user);
   }
 
@@ -136,14 +142,18 @@ export class AuthController {
     return this.authService.verifyJwt(payload.jwt);
   }
 
-  //refresh
-  @UseGuards(JwtRefreshGuard)
+  //refresh request end point 
   @Get('refresh')
-  async refresh() {
-    this.authService.createJWTToken(user);
-
-    return request.User_name;
-  }
+   async refresh(
+    payload: UserDetails  ,@Res({ passthrough: true }) res: Response,@Req() req
+  ) {
+  const token= this.authService.createJWTToken(payload);
+  console.log(payload);
+  
+  // const { user } = await this.authService.resolveRefreshToken(req,payload);//decode refresh token
+   return{'refreshed tokens':  token,  httpOnly: true };
+  
+}
 
   //logout route to secure malicioud activity
   @Get('log-out')

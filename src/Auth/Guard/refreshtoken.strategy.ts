@@ -1,34 +1,49 @@
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, ExtractJwt } from 'passport-jwt';
-import { Injectable, UnauthorizedException, Body } from '@nestjs/common';
+import { Request } from 'express';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UserService } from 'src/User/user.service';
 
 @Injectable()
-export class JwtRefreshTokenStrategy extends PassportStrategy(
-  Strategy,
-  'jwt-refreshtoken',
-) {
+export class RefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
   constructor(private userService: UserService) {
     super({
-      jwtFromRequest: ExtractJwt.fromBodyField('jwt'),
       ignoreExpiration: true,
-      secretOrKey: process.env.JWT_RefreshTokenSECRET,
-      signOptions: { expiresIn: '10m' },
       passReqToCallback: true,
+      secretOrKey: process.env.JWT_RefreshTokenSECRET,
+      refreshTokenExp: { expiresIn: '10m' },
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request) => {
+          let data = request?.cookies['auth-cookie'];
+          if (!data) {
+            return null;
+          }
+          return data.token;
+        },
+      ]),
     });
   }
 
-  async validate(req, payload: any) {
-    var user = await this.userService.findOne(payload.User);
+  async validate(req: Request, payload: any) {
+    if (!payload) {
+      throw new BadRequestException('invalid jwt token');
+    }
+    let data = req?.cookies['auth-cookie'];
+    if (!data?.refreshToken) {
+      throw new BadRequestException('invalid refresh token');
+    }
+    let user = await this.userService.validRefreshToken(
+      payload.email,
+      data.refreshToken,
+    );
     if (!user) {
-      throw new UnauthorizedException();
+      throw new BadRequestException('token expired');
     }
-    if (req.body.refreshToken != user.refreshtoken) {
-      throw new UnauthorizedException();
-    }
-    if (new Date() > new Date(user.refreshtokenexpires)) {
-      throw new UnauthorizedException();
-    }
-    return { ...payload.user };
+
+    return user;
   }
 }

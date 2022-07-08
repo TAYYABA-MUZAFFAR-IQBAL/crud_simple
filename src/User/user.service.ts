@@ -111,7 +111,7 @@ export class UserService {
 
   //update remove refresh token
 
-  async update(
+  async updateandsave(
     email: string,
     updateUserDto: UserUpdateDto,
   ): Promise<UserDocument> {

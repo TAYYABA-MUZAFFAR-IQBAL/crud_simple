@@ -43,8 +43,8 @@ export class UserSchema {
   refreshtokenexpires: string;
 
   @Prop()
-  is_revoked: false;
-  res: any;
+  is_revoked: Boolean;
+  
 }
 
 export const UserModel = SchemaFactory.createForClass(UserSchema);

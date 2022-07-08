@@ -136,13 +136,13 @@ export class AuthController {
   }
 
   //refresh
-  // @UseGuards(JwtRefreshGuard)
-  // @Get('refresh')
-  // async refresh() {
-  //   const RegenratedToken = this.authService.createJWTToken(user);
+  @UseGuards(JwtRefreshGuard)
+  @Get('refresh')
+  async refresh() {
+    this.authService.createJWTToken(user);
 
-  //   return request.User_name;
-  // }
+    return request.User_name;
+  }
 
   //logout route to secure malicioud activity
   @Get('log-out')

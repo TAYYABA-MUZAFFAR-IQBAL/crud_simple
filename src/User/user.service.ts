@@ -119,4 +119,22 @@ export class UserService {
       .findByIdAndUpdate(email, updateUserDto, { new: true })
       .exec();
   }
+
+  public async validRefreshToken(
+    email: string,
+    refreshToken: string,
+  ): Promise<UserDetails> {
+    let user = await this.user.findOne({
+      where: {
+        email: email,
+        refreshToken: refreshToken,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return;
+  }
 }

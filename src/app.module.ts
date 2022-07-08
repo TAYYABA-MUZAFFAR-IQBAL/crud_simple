@@ -19,7 +19,6 @@ import { ConfigModule } from '@nestjs/config';
     UserModule,
     AuthModule,
     BookModule,
-    
   ],
 
   controllers: [AppController],

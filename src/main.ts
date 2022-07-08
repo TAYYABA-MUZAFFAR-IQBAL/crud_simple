@@ -10,17 +10,18 @@ async function bootstrap() {
     .setTitle('Swagger Test In NestJS')
     .setDescription('Practice API Application')
     .setVersion('v1')
-    .addBearerAuth({
-      type: 'http',
-      scheme: 'bearer',
-      bearerFormat: 'JWT',
-      name: 'JWT',
-      description: 'Enter JWT token',
-      in: 'header',
-    },
-    'JWT-auth',
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
     )
-    
+
     .build();
   //swagger document creation for this demo
   const document = SwaggerModule.createDocument(app, config);

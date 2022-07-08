@@ -1,9 +1,14 @@
-import { ExecutionContext, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { UserSchema, UserDocument } from './user.model';
 import { FilterQuery, Model, UpdateQuery } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserUpdateDto } from './UserUpdate.dto';
-import { UserDetails } from "./userInterface.details";
+import { UserDetails } from './userInterface.details';
 import { UserRole } from './Role.enum';
 
 @Injectable()
@@ -13,10 +18,8 @@ export class UserService {
   }
   [x: string]: any;
   constructor(
-    @InjectModel( UserSchema.name) private UserMod: Model<UserDocument>,
+    @InjectModel(UserSchema.name) private UserMod: Model<UserDocument>,
   ) {}
-
-
 
   _getUserDetails(user: UserDocument): UserDetails {
     return {
@@ -24,7 +27,6 @@ export class UserService {
       User_name: user.User_name,
       email: user.email,
       role: user.role,
-      
     };
   }
 
@@ -42,22 +44,22 @@ export class UserService {
     User_name: string,
     email: string,
     hashedPassword: string,
-    role:UserRole
+    role: UserRole,
   ): Promise<UserDocument> {
     const newUser = new this.UserMod({
       User_name,
       email,
       password: hashedPassword,
-      role
+      role,
     });
     return newUser.save();
   }
-  
-  //to find the user who is login 
+
+  //to find the user who is login
   async findOne(userName: string): Promise<UserDocument | undefined> {
-    return  this.UserMod.findOne({userName});
+    return this.UserMod.findOne({ userName });
   }
-  
+
   //  reading the user collection
   async getAllUser() {
     return this.UserMod.find({})
@@ -67,10 +69,11 @@ export class UserService {
       .catch((err) => console.log(err));
   }
 
-
-
   // upadting the data
-  async userUpdate(id: string, data: UpdateQuery<UserDocument> | UserUpdateDto): Promise<UserSchema> {
+  async userUpdate(
+    id: string,
+    data: UpdateQuery<UserDocument> | UserUpdateDto,
+  ): Promise<UserSchema> {
     return this.UserMod.findByIdAndUpdate(id, data, { new: true });
   }
 
@@ -78,45 +81,42 @@ export class UserService {
   async delUser(id: string) {
     return this.UserMod.findByIdAndRemove(id);
   }
-  async saveorupdateRefreshToken(
-    refreshToken:string,
-    id:string, 
-  ){
-   await this.UserMod.updateOne(id as any,{refreshtoken:refreshToken});
- }
-
- //find token through id 
-
- public async findForId (id: number): Promise<UserDocument| null> {
-  return this.UserMod.findOne({
-    where: {
-      id,
-    },
-  })
-}
-//get user by email
-async getByEmail(email: string) {
-  const user = await this.findOneemail(email);
-  if (user) {
-    return user;
+  async saveorupdateRefreshToken(refreshToken: string, id: string) {
+    await this.UserMod.updateOne(id as any, { refreshtoken: refreshToken });
   }
-  throw new HttpException('User with this email does not exist', HttpStatus.NOT_FOUND);
-}
-async findOneemail(email: string): Promise<UserDocument | undefined> {
-  return  this.UserMod.findOne({email});
-}
 
+  //find token through id
 
-//update remove refresh token 
+  public async findForId(id: number): Promise<UserDocument | null> {
+    return this.UserMod.findOne({
+      where: {
+        id,
+      },
+    });
+  }
+  //get user by email
+  async getByEmail(email: string) {
+    const user = await this.findOneemail(email);
+    if (user) {
+      return user;
+    }
+    throw new HttpException(
+      'User with this email does not exist',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+  async findOneemail(email: string): Promise<UserDocument | undefined> {
+    return this.UserMod.findOne({ email });
+  }
 
+  //update remove refresh token
 
-async update(
-  email: string,
-  updateUserDto: UserUpdateDto,
-): Promise<UserDocument> {
-  return this.userModel
-    .findByIdAndUpdate(email, updateUserDto, { new: true })
-    .exec();
-}
-  
+  async update(
+    email: string,
+    updateUserDto: UserUpdateDto,
+  ): Promise<UserDocument> {
+    return this.userModel
+      .findByIdAndUpdate(email, updateUserDto, { new: true })
+      .exec();
+  }
 }

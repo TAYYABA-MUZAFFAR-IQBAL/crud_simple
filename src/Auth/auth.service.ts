@@ -1,12 +1,10 @@
-import { ExistingUserDTO } from '../User/dto/exisistingUser.dto';
-import { UserDetails } from '../User/userInterface.details';
-import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { ExistingUserDTO } from '../User/dto/exisistingUser.dto';
 import { NewUserDTO } from '../User/dto/newUser.dto';
 import { UserService } from '../User/user.service';
-import { JwtService } from '@nestjs/jwt';
-import { UserSchema } from 'src/User/user.model';
-var randtoken = require('rand-token');
+import { UserDetails } from '../User/userInterface.details';
 
 @Injectable()
 export class AuthService {
@@ -74,48 +72,31 @@ export class AuthService {
     return this.userService._getUserDetails(user);
   }
 
-  async login(
-    existingUser: ExistingUserDTO,
-  ): Promise<{ token: string; refreshtoken: string } | null> {
+  async login(existingUser: ExistingUserDTO): Promise<{ token: string }> {
     const { email, password } = existingUser;
     const user = await this.validateUser(email, password);
 
     if (!user)
       throw new HttpException('Credentials invalid!', HttpStatus.UNAUTHORIZED);
 
-    const jwt = await this.jwtService.signAsync(user);
-    const refresh = await this.jwtService.signAsync(user);
-    console.log('user LoggedIn sucessfully', user);
-    return { token: jwt, refreshtoken: refresh };
+    const jwt = await this.createJWTToken(user);
+    console.log('user LoggedIn successfully', user);
+    return { token: jwt };
   }
-  //resresh token generation
-//  async generateRefreshToken(userId): Promise<string> {
-//     var refreshToken = randtoken.generate(200); //generating refresh token containing 200 digits
-//     var expirydate = new Date();
-//     expirydate.setDate(expirydate.getDate() + 6); //expires in 6 days
-//     await this.userService.saveorupdateRefreshToke(
-//       refreshToken,
-//       userId,
-//       expirydate,
-//     );
-//     return refreshToken;
-//   }
-async RegenrateTokens( payload: string ): Promise<{ token: string; refreshtoken: string } | null>{
-  const jwt = await this.jwtService.signAsync(payload);
-  const refresh = await this.jwtService.signAsync(payload);
-   return { token: jwt, refreshtoken: refresh };
-}
-  
+
+  async createJWTToken(payload: UserDetails): Promise<string> {
+    const refreshToken = 'refreshToken';
+    const jwt = await this.jwtService.signAsync({ ...payload, refreshToken });
+    return jwt;
+  }
 
   //jwt expiry generator
   async verifyJwt(jwt: string): Promise<{ exp: number }> {
     try {
-      const { exp } = await this.jwtService.verifyAsync(jwt);
+      const [exp] = await this.jwtService.verifyAsync(jwt);
       return { exp };
     } catch (error) {
       throw new HttpException('Invalid JWT', HttpStatus.UNAUTHORIZED);
     }
   }
-
- 
 }

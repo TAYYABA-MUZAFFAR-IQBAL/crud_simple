@@ -1,35 +1,42 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards ,Request, Req} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ExistingUserDTO } from '../User/dto/exisistingUser.dto';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { ApiResponse } from '@nestjs/swagger';
 import { NewUserDTO } from '../User/dto/newUser.dto';
-import { UserDetails } from '../User/userInterface.details';
-import { AuthService } from './auth.service';
-import { IsNotEmpty } from 'class-validator'
 import { UserRole } from '../User/Role.enum';
 import { UserSchema } from '../User/user.model';
-import {TokensService  } from './RegenerateToken.service';
+import { UserDetails } from '../User/userInterface.details';
+import { AuthService } from './auth.service';
 import { JwtGuard } from './Guard/jwt.guard';
-
+import { TokensService } from './RegenerateToken.service';
 
 export interface AuthenticationPayload {
-  user: UserSchema
+  user: UserSchema;
   payload: {
-    type: string
-    token: string
-    refresh_token?: string
-  }
+    type: string;
+    token: string;
+    refresh_token?: string;
+  };
 }
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  private readonly tokens: TokensService
+  private readonly tokens: TokensService;
 
-  constructor(private authService: AuthService,tokens: TokensService) { this.tokens = tokens}
+  constructor(private authService: AuthService, tokens: TokensService) {
+    this.tokens = tokens;
+  }
 
   @Post('register')
   @ApiOperation({ summary: 'Api to add new user' })
-
   @ApiBody({
     schema: {
       type: 'object',
@@ -47,13 +54,13 @@ export class AuthController {
         password: {
           type: 'string',
           example: '******',
-          description: 'pasword of user',
+          description: 'password of user',
         },
         role: {
           type: 'enum',
           enum: [UserRole.Admin, UserRole.Librarian, UserRole.User],
           description: 'role of user must be the given role to select',
-          default:UserRole.User,
+          default: UserRole.User,
         },
       },
     },
@@ -104,8 +111,7 @@ export class AuthController {
   @ApiOperation({
     summary: 'This API is to check the token validity',
   })
-
-    @ApiBody({
+  @ApiBody({
     schema: {
       type: 'object',
       properties: {
@@ -114,7 +120,6 @@ export class AuthController {
           example: '',
           description: 'Token of login user',
         },
-        
       },
     },
   })
@@ -125,69 +130,19 @@ export class AuthController {
   @ApiResponse({ status: 403, description: 'Invalid Token' })
   @HttpCode(HttpStatus.OK)
   verifyJwt(@Body() payload: { jwt: string }) {
-    console.log("Token is valid...");
-    
+    console.log('Token is valid...');
+
     return this.authService.verifyJwt(payload.jwt);
   }
 
- 
-
-  // //post request for regenrate the acess token from refresh token 
- 
-  // @UseGuards(JwtGuard)
-  // @Post('refresh')
-  // @ApiOperation({
-  //   summary: 'This API Regenerate the access tokrn from refresh token',
-  // })
-  // @ApiBody({
-  //   description: 'Refresh Token',
-  //   required: true,
-  //   schema: {
-  //     type: 'object',
-  //     properties: {
-  //       RefreshToken: {
-  //         type: 'string',
-  //         example: '',
-  //         description: 'Refresh Token for the creation of new access token',
-  //       },
-        
-  //     },
-  //   },
-  //     })
-
-  // public async refresh (@Body() body:{refresh_Token: string}) {
-  //             const { user, token } = await this.tokens.createAccessTokenFromRefreshToken(body.refresh_Token)
-  //         const payload = this.buildResponsePayload(user, token)
-      
-  //         return {
-  //             status: 'success',
-  //           data: payload,
-  //         }
-         
-  //     }
-  // //create the new access token from refresh token
-  // private buildResponsePayload (user: UserSchema, accessToken: string, refreshToken?: string): AuthenticationPayload {
-  //   return {
-  //     user: user,
-  //     payload: {
-  //       type: 'bearer',
-  //       token: accessToken,
-  //       ...(refreshToken ? { refresh_token: refreshToken } : {}),
-  //     }
-  //   }
-  // }
-
   //refresh
   // @UseGuards(JwtRefreshGuard)
-  @Get('refresh')
- async refresh(@Req() request: UserSchema) {
-    const RegenratedToken = this.authService.RegenrateTokens(request.User_name);
-   const decodedRefreshToken =this.authService.verifyJwt(request.User_name
-    )
-    ;(await decodedRefreshToken).exp
-    request.res.setHeader('Refresh-token', RegenratedToken );
-    return request.User_name;
-  }
+  // @Get('refresh')
+  // async refresh() {
+  //   const RegenratedToken = this.authService.createJWTToken(user);
+
+  //   return request.User_name;
+  // }
 
   //logout route to secure malicioud activity
   @Get('log-out')
@@ -198,7 +153,4 @@ export class AuthController {
     await this.tokens.removeRefreshToken(user.email);
     req.res.setHeader('Authorization', null);
   }
-
-
-
 }

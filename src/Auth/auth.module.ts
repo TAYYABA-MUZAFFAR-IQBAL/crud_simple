@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import {TokensService  } from './RegenerateToken.service';
 import { UserModule } from '../User/user.module';
+import { TokensService } from './RegenerateToken.service';
 
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -28,7 +28,14 @@ import { RolesGuard } from './Guard/roleGuard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, RolesGuard, JwtGuard, JwtStrategy,JwtRefreshTokenStrategy,TokensService ],
+  providers: [
+    AuthService,
+    RolesGuard,
+    JwtGuard,
+    JwtStrategy,
+    JwtRefreshTokenStrategy,
+    TokensService,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

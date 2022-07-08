@@ -37,12 +37,11 @@ export class UserSchema {
   role: UserRole[];
 
   @Prop({ nullable: true })
-  
   refreshtoken: string;
- 
+
   @Prop()
   refreshtokenexpires: string;
-  
+
   @Prop()
   is_revoked: false;
   res: any;

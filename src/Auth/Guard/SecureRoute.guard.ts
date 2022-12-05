@@ -13,7 +13,7 @@ export class SecureRoute implements CanActivate {
 
     const user = request.user as any;
 
-    console.log('login user id: ', user.id);
+    console.log('login user id: ',user.id);
     console.log('id from parameters: ', request.params.id);
     if (user.id === request.params.id) {
       console.log('User is valid to perform this action');

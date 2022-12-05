@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Document } from 'mongoose';
+import { Transform, Type } from 'class-transformer';
+import mongoose, { Document } from 'mongoose';
+import { BooksClass, BooksSchema } from '../Books/books.models';
 import { UserRole } from './Role.enum';
 export type UserDocument = UserSchema & Document;
 
@@ -37,6 +39,13 @@ export class UserSchema {
 
   @Prop({ nullable: true })
   refresh_token: string;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: BooksClass.name })
+  @Type(() => BooksClass)
+  book: BooksClass;
+
+  //  @Transform(({ value }) => value.toString())
+  // _id: string;
 }
 
 export const UserModel = SchemaFactory.createForClass(UserSchema);

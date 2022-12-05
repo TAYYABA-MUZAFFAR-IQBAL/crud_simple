@@ -1,3 +1,5 @@
+import { MailerModule, MailerService } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -13,6 +15,22 @@ import { RolesGuard } from './Guard/roleGuard';
 @Module({
   imports: [
     UserModule,
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        transport: 'smtps://user@domain.com:pass@smtp.domain.com',
+        defaults: {
+          from: '"nest-modules" <modules@nestjs.com>',
+        },
+        template: {
+          dir: __dirname + '/templates',
+          adapter: new HandlebarsAdapter(), // or new PugAdapter()
+          options: {
+            strict: true,
+          },
+        },
+      }),
+    }),
+    ,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

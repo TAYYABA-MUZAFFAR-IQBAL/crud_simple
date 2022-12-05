@@ -11,12 +11,14 @@ import { NewUserDTO } from '../User/dto/newUser.dto';
 import { UserService } from '../User/user.service';
 import { UserDetails } from '../User/userInterface.details';
 import * as randomToken from 'rand-token';
+import { MailerService } from '@nestjs-modules/mailer';
 import { UserRole } from 'src/User/Role.enum';
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    private readonly mailerService: MailerService,
   ) {}
 
   async hashPassword(password: string): Promise<string> {
@@ -24,7 +26,7 @@ export class AuthService {
   }
 
   async register(user: Readonly<NewUserDTO>): Promise<UserDetails | any> {
-    const { user_name, email, password, role } = user;
+    const { user_name, email, password, role, book } = user;
 
     const existingUser = await this.userService.findByEmail(email);
 
@@ -41,6 +43,7 @@ export class AuthService {
       email,
       password: hashedPassword,
       role: role || UserRole.User,
+      book,
     });
     return this.userService._getUserDetails(newUser);
   }
@@ -92,7 +95,7 @@ export class AuthService {
 
   async createJWTToken(payload: UserDetails): Promise<string> {
     const refreshToken = randomToken.generate(16);
-    await this.userService.saveRefreshToken(payload.id, refreshToken);
+    await this.userService.saveRefreshToken(payload._id, refreshToken);
     const jwt = await this.jwtService.signAsync({
       user: payload,
       refreshToken,
@@ -108,5 +111,21 @@ export class AuthService {
     } catch (error) {
       throw new HttpException('Invalid JWT', HttpStatus.UNAUTHORIZED);
     }
+  }
+  public send(): void {
+    this.mailerService
+      .sendMail({
+        to: 'tayyaba@gmail.com', // List of receivers email address
+        from: 'user@outlook.com', // Senders email address
+        subject: 'Testing Nest MailerModule ✔', // Subject line
+        text: 'welcome', // plaintext body
+        html: '<b>welcome</b>', // HTML body content
+      })
+      .then((success) => {
+        console.log(success);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }

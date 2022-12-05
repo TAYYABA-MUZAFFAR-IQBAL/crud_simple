@@ -151,14 +151,4 @@ export class AuthController {
     const token = await this.authService.createJWTToken(req.user.user);
     return { token };
   }
-
-  //logout route to secure malicioud activity
-  @Get('log-out')
-  @ApiOperation({ description: 'Logout' })
-  @UseGuards(JwtGuard)
-  @HttpCode(200)
-  async logOut(@Request() req: any, user: UserDetails) {
-    // await this.tokens.removeRefreshToken(user.email);
-    // req.res.setHeader('Authorization', null);
-  }
 }

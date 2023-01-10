@@ -26,7 +26,7 @@ export class AuthService {
   }
 
   async register(user: Readonly<NewUserDTO>): Promise<UserDetails | any> {
-    const { user_name, email, password, role, book } = user;
+    const { user_name, email, password, role } = user;
 
     const existingUser = await this.userService.findByEmail(email);
 
@@ -42,8 +42,7 @@ export class AuthService {
       user_name,
       email,
       password: hashedPassword,
-      role: role || UserRole.User,
-      book,
+      role: role || UserRole.User
     });
     return this.userService._getUserDetails(newUser);
   }
